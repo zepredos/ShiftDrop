@@ -49,7 +49,7 @@ def main():
         shutil.copytree(ROOT/'dist/portable/ShiftDrop',stage/'ShiftDrop')
         shutil.copytree(ROOT/'linux',stage/'linux',ignore=shutil.ignore_patterns('tests'))
         scripts = stage/'scripts'; scripts.mkdir()
-        for installer in ('install-linux.py','install-windows.ps1'):
+        for installer in ('install-linux.py','install-windows.ps1','install-windows.cmd'):
             shutil.copy2(ROOT/'scripts'/installer,scripts/installer)
         shutil.copy2(ROOT/'README.md',stage/'README.md')
         shutil.copytree(ROOT/'docs',stage/'docs')

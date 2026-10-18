@@ -1,6 +1,12 @@
 import importlib.util
 from pathlib import Path
 import shlex
+import os
+import shutil
+import subprocess
+import sys
+
+import pytest
 
 
 def test_linux_bundle_installs_launchers_and_extension(tmp_path, monkeypatch):
@@ -31,3 +37,20 @@ def test_linux_bundle_installs_launchers_and_extension(tmp_path, monkeypatch):
     assert ' --background' in (data / 'dbus-1/services' / (installer.APP_ID + '.service')).read_text()
     assert (data / 'gnome-shell/extensions' / installer.UUID / 'extension.js').read_text() == '// fixture'
     assert (data / 'shiftdrop/app/ShiftDrop').read_bytes() == b'test executable'
+
+
+@pytest.mark.skipif(sys.platform != 'win32', reason='Requires Windows PowerShell and cmd.exe')
+@pytest.mark.parametrize('exit_code', [0, 17])
+def test_windows_launcher_uses_process_policy_and_preserves_result(tmp_path, exit_code):
+    folder = tmp_path / 'installer with spaces & parentheses (test)'
+    folder.mkdir()
+    launcher = folder / 'install-windows.cmd'
+    shutil.copy2(Path(__file__).resolve().parents[2] / 'scripts/install-windows.cmd', launcher)
+    (folder / 'install-windows.ps1').write_text(
+        "if ((Get-ExecutionPolicy -Scope Process) -ne 'Bypass') { exit 99 }\n"
+        f"Write-Output 'Launcher policy verified'\nexit {exit_code}\n", encoding='ascii')
+    result = subprocess.run(['cmd.exe', '/d', '/c', str(launcher)], input='',
+        capture_output=True, text=True, timeout=30,
+        env={**os.environ, 'PSExecutionPolicyPreference': 'Restricted'})
+    assert 'Launcher policy verified' in result.stdout, result.stdout + result.stderr
+    assert result.returncode == exit_code, result.stdout + result.stderr
