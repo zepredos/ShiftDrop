@@ -119,11 +119,12 @@ def main():
                 wait_for(lambda: call('org.freedesktop.DBus', '/org/freedesktop/DBus',
                     'org.freedesktop.DBus', 'NameHasOwner', '(s)', (APP,))[0], 'desktop app D-Bus bridge')
                 for method, signature, values in [('ShowWheel', '(iib)', (640, 360, False)),
-                        ('ToggleWheel', None, ()), ('HideWheel', None, ()), ('Open', None, ())]:
+                        ('ToggleWheel', None, ()), ('HideWheel', None, ())]:
                     call(APP, '/io/github/shiftdrop/ShiftDrop', APP, method, signature, values)
                 assert all(process.poll() is None for process in processes), 'A desktop process exited'
                 call(APP, '/io/github/shiftdrop/ShiftDrop', APP, 'HideWheel')
                 drag_test(base)
+                call(APP, '/io/github/shiftdrop/ShiftDrop', APP, 'Open')
                 call('org.gnome.Shell', '/org/gnome/Shell', 'org.gnome.Shell.Extensions',
                      'DisableExtension', '(s)', (UUID,))
                 wait_for(lambda: extension_info().get('state') == 2, 'extension cleanup')
