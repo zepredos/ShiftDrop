@@ -13,7 +13,7 @@ from shiftdrop.wheel import Wheel
 
 def test_hyprland_socket_and_message_validation():
     assert socket_path({'XDG_RUNTIME_DIR': '/run/user/1000', 'HYPRLAND_INSTANCE_SIGNATURE': 'abc_123'}) == '/run/user/1000/hypr/abc_123/.socket2.sock'
-    for signature in ('', '../other', '/tmp/socket', 'bad\nname'):
+    for signature in ('', '.', '..', '../other', '/tmp/socket', 'bad\nname'):
         with pytest.raises(ValueError):
             socket_path({'XDG_RUNTIME_DIR': '/run/user/1000', 'HYPRLAND_INSTANCE_SIGNATURE': signature})
     assert wheel_event(b'shiftdrop>>show,-1920,540') == ('show', -1920, 540)

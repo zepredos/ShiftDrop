@@ -13,6 +13,7 @@ python3Packages.buildPythonApplication {
   pyproject = true;
   build-system = [ python3Packages.setuptools ];
   nativeBuildInputs = [ qt6.wrapQtAppsHook ];
+  buildInputs = [ qt6.qtwayland ];
   dependencies = with python3Packages; [
     pyside6 pillow pillow-heif pypdfium2 python-docx reportlab striprtf
   ];

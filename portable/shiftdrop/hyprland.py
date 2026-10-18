@@ -11,7 +11,7 @@ from PySide6.QtNetwork import QLocalSocket
 def socket_path(environment):
     signature = environment.get('HYPRLAND_INSTANCE_SIGNATURE', '')
     runtime = environment.get('XDG_RUNTIME_DIR', '')
-    if not runtime or not PurePosixPath(runtime).is_absolute() or not re.fullmatch(r'[A-Za-z0-9_.-]+', signature):
+    if not runtime or not PurePosixPath(runtime).is_absolute() or not re.fullmatch(r'[A-Za-z0-9_-]+', signature):
         raise ValueError('Hyprland session socket is unavailable.')
     return str(PurePosixPath(runtime) / 'hypr' / signature / '.socket2.sock')
 

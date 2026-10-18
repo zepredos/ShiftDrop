@@ -36,6 +36,8 @@ jobs:
         run: nix build .#shiftdrop --out-link result-app --print-build-logs
       - name: Smoke test Nix application
         run: dbus-run-session -- python3 scripts/test-package.py result-app/bin/shiftdrop
+      - name: Complete gesture in NixOS VM with virtual GPU
+        run: nix build .#checks.x86_64-linux.hyprland --print-build-logs --no-link
       - uses: actions/upload-artifact@v4
         if: always()
         with:
