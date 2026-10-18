@@ -49,7 +49,8 @@ def test_windows_launcher_uses_process_policy_and_preserves_result(tmp_path, exi
     (folder / 'install-windows.ps1').write_text(
         "if ((Get-ExecutionPolicy -Scope Process) -ne 'Bypass') { exit 99 }\n"
         f"Write-Output 'Launcher policy verified'\nexit {exit_code}\n", encoding='ascii')
-    result = subprocess.run(['cmd.exe', '/d', '/c', str(launcher)], input='',
+    # cmd /s consumes an outer quote pair before parsing the quoted batch path.
+    result = subprocess.run(f'cmd.exe /d /s /c ""{launcher}""', input='',
         capture_output=True, text=True, timeout=30,
         env={**os.environ, 'PSExecutionPolicyPreference': 'Restricted'})
     assert 'Launcher policy verified' in result.stdout, result.stdout + result.stderr
