@@ -34,10 +34,10 @@ The extension polls pointer modifiers only during a drag with `text/uri-list` am
 
 ## Other Linux desktops
 
-X11 has a direct adapter that checks the XDND selection and Shift/mouse state. Hyprland, KDE Wayland, and other Wayland compositors currently have no global gesture adapter; use Choose File or drop into the app window once the app is running. They must not be advertised as having the GNOME gesture until a compositor-specific integration is implemented and tested.
+X11 has a direct adapter that checks the XDND selection and Shift/mouse state. Hyprland 0.56.2 has an experimental compositor companion; see [Hyprland and NixOS setup](HYPRLAND.md). KDE Wayland and other Wayland compositors currently have no global gesture adapter; use Choose File or drop into the app window once the app is running.
 
-The available physical Linux test targets are NixOS/Hyprland and Fedora/Hyprland. Neither has been validated. The GNOME Shell companion cannot supply their gesture. Hyprland integration needs its own drag/modifier detection and wheel placement, and NixOS also needs a tested installation/package path. Record the output of `hyprctl version` for each target before implementing or claiming support.
+The available physical Linux test targets are NixOS/Hyprland and Fedora/Hyprland. Neither has been validated. The GNOME Shell companion cannot supply their gesture. The Hyprland companion targets 0.56.2 and rejects builds that do not match the running compositor. The NixOS module uses the existing system Hyprland package. Record the output of `hyprctl version` for each target before installing its companion.
 
-For an initial app/conversion test on Fedora/Hyprland, install with `python3 scripts/install-linux.py --no-gnome-extension`, then use Choose File or drop into the app window. This does not enable the system-wide drag + Shift gesture. Do not treat this installation path as validated on NixOS.
+For an initial app/conversion test on Fedora/Hyprland, install with `python3 scripts/install-linux.py --no-gnome-extension`, then use Choose File or drop into the app window. The system-wide gesture additionally requires the version-matched Hyprland companion. NixOS should use the flake module instead of the user-local Python installer.
 
 The blur and glass appearance vary with the compositor. The radial geometry, labels, controls, and orange selection styling are drawn by the app.

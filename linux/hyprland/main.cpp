@@ -38,7 +38,9 @@ void prepare(PHLWINDOW window) {
         return;
     using namespace Desktop::Types;
     window->m_isFloating = true;
-    window->m_ruleApplicator->noFocus().set(true, PRIORITY_SET_PROP);
+    // noFocus also excludes a window from pointer hit testing, breaking file drops.
+    window->m_noInitialFocus = true;
+    window->m_ruleApplicator->noFollowMouse().set(true, PRIORITY_SET_PROP);
     window->m_ruleApplicator->noAnim().set(true, PRIORITY_SET_PROP);
     window->m_ruleApplicator->decorate().set(false, PRIORITY_SET_PROP);
     window->m_ruleApplicator->borderSize().set(0, PRIORITY_SET_PROP);

@@ -32,6 +32,10 @@ Open **ShiftDrop** from Applications, or use its GNOME panel icon. The panel ico
 
 The extension targets GNOME 46–51 APIs. Ubuntu 24.04 with GNOME 46.2 has passed a headless Wayland test of the complete drag, Shift, second-Shift toggle, and copy-drop conversion flow. Other GNOME versions and physical desktop configurations still need validation. See [Linux setup and smoke test](docs/LINUX.md).
 
+## Linux: Hyprland 0.56.2
+
+An experimental compositor companion adds drag + Shift, second-Shift toggling, and wheel placement on Hyprland 0.56.2. NixOS users can keep Hyprland in `configuration.nix`: the supplied module builds the companion against the configured system package. See [NixOS and Fedora setup](docs/HYPRLAND.md) and the private Hyprland validation workflow. Physical desktops still need validation.
+
 ## Windows
 
 Extract the entire Windows binary ZIP, then open `ShiftDrop\ShiftDrop.exe` to run immediately. For a Start menu shortcut, double-click `scripts\install-windows.cmd`.
@@ -98,4 +102,4 @@ GitHub Actions runs tests and builds native Linux, Windows, and Mac artifacts in
 
 The portable suite has 29 shared tests covering conversion, offscreen Qt UI, and Linux installation, plus three Windows-only installer checks. Two additional tests exercise the GNOME drag state machine. The native Mac app retains its eight tests. Coverage includes real codec decoding, PDF/text/DOCX export, multi-page rollback on failure, output collisions, copy drop semantics, editor layouts, aspect ratios, flattened redaction, launcher paths containing spaces, Python version validation, and process-scoped PowerShell policy handling. Linux and Windows packages must also pass a frozen-app startup check.
 
-The source is in the private [zepredos/ShiftDrop validation repository](https://github.com/zepredos/ShiftDrop). [Validation run 39138434647](https://github.com/zepredos/ShiftDrop/actions/runs/39138434647) passed all four jobs: Linux tests/package/startup, Windows tests/package/startup, native Mac tests/package, and the complete GNOME Wayland drag flow. The user confirmed the app works on Mac and Windows on 2026-10-18. Available physical Linux test machines run NixOS/Hyprland and Fedora/Hyprland; their global drag gesture is not implemented yet. Detailed desktop checks, licensing, and public publication remain release gates. See [Linux scope](docs/LINUX.md), [release checklist](docs/PUBLISHING.md), and [contributor instructions](CONTRIBUTING.md).
+The source is in the private [zepredos/ShiftDrop validation repository](https://github.com/zepredos/ShiftDrop). [Validation run 39141604776](https://github.com/zepredos/ShiftDrop/actions/runs/39141604776) passed all four jobs: Linux tests/package/startup, Windows tests/package/startup, native Mac tests/package, and the complete GNOME Wayland drag flow. The user confirmed the app works on Mac and Windows on 2026-10-18. An experimental Hyprland companion and NixOS module are undergoing separate build and VM validation. Detailed desktop checks, licensing, and public publication remain release gates. See [Linux scope](docs/LINUX.md), [release checklist](docs/PUBLISHING.md), and [contributor instructions](CONTRIBUTING.md).
