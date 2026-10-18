@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run with system Python inside dbus-run-session on a Linux GNOME test runner."""
 
+import json
 import os
 from pathlib import Path
 import shutil
@@ -42,6 +43,55 @@ def extension_info():
                 'GetExtensionInfo', '(s)', (UUID,))[0]
 
 
+def drag_test(directory):
+    # Mutter's test session receives virtual input; the user's desktop is never involved.
+    name = 'org.gnome.Mutter.RemoteDesktop'
+    session, = call(name, '/org/gnome/Mutter/RemoteDesktop', name, 'CreateSession')
+    interface = name + '.Session'
+
+    def input_event(method, signature=None, values=()):
+        call(name, session, interface, method, signature, values)
+        time.sleep(.15)
+
+    def state():
+        path = directory / 'state.json'
+        return json.loads(path.read_text()) if path.exists() else {}
+
+    input_event('Start')
+    try:
+        input_event('NotifyKeyboardKeycode', '(ub)', (1, True))
+        input_event('NotifyKeyboardKeycode', '(ub)', (1, False))
+        time.sleep(1)
+        input_event('NotifyPointerMotionRelative', '(dd)', (-10000., -10000.))
+        input_event('NotifyPointerMotionRelative', '(dd)', (640., 360.))
+        input_event('NotifyPointerButton', '(ib)', (272, True))
+        input_event('NotifyPointerMotionRelative', '(dd)', (40., 0.))
+        input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
+        wait_for(lambda: state().get('visible'), 'drag + Shift wheel')
+        input_event('NotifyKeyboardKeycode', '(ub)', (42, False))
+        input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
+        wait_for(lambda: state().get('tools'), 'second Shift tools wheel')
+        input_event('NotifyKeyboardKeycode', '(ub)', (42, False))
+        input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
+        wait_for(lambda: state().get('visible') and not state().get('tools'), 'conversion wheel toggle')
+        input_event('NotifyPointerMotionRelative', '(dd)', (0., -110.))
+        input_event('NotifyPointerButton', '(ib)', (272, False))
+        input_event('NotifyKeyboardKeycode', '(ub)', (42, False))
+        wait_for(lambda: state().get('outputs'), 'converted copy after real Wayland drop')
+        result = state()
+        assert result['drop_action'] == 1, result  # Qt.CopyAction even while Shift requests move.
+        original = directory / 'Drag Original.png'
+        output, = map(Path, result['outputs'])
+        assert original.read_bytes().startswith(b'\x89PNG'), 'Original was changed'
+        assert output != original and output.read_bytes().startswith(b'\xff\xd8'), result
+        print('Real Wayland drag: Shift opened, second Shift toggled, JPEG drop copied, original preserved.')
+    except BaseException:
+        print('Last drag state:', state())
+        raise
+    finally:
+        input_event('Stop')
+
+
 def main():
     processes = []
     with tempfile.TemporaryDirectory(prefix='shiftdrop-gnome-') as directory:
@@ -64,7 +114,7 @@ def main():
                     stdout=shell_log, stderr=subprocess.STDOUT))
                 wait_for(lambda: extension_info().get('state') == 1, 'enabled GNOME extension')
                 assert not extension_info().get('error'), extension_info()
-                processes.append(subprocess.Popen([sys.argv[1], '-m', 'shiftdrop', '--background'],
+                processes.append(subprocess.Popen([sys.argv[1], str(ROOT / 'scripts/gnome-drag-fixture.py'), str(base)],
                     cwd=ROOT, env=env, stdout=app_log, stderr=subprocess.STDOUT))
                 wait_for(lambda: call('org.freedesktop.DBus', '/org/freedesktop/DBus',
                     'org.freedesktop.DBus', 'NameHasOwner', '(s)', (APP,))[0], 'desktop app D-Bus bridge')
@@ -72,6 +122,8 @@ def main():
                         ('ToggleWheel', None, ()), ('HideWheel', None, ()), ('Open', None, ())]:
                     call(APP, '/io/github/shiftdrop/ShiftDrop', APP, method, signature, values)
                 assert all(process.poll() is None for process in processes), 'A desktop process exited'
+                call(APP, '/io/github/shiftdrop/ShiftDrop', APP, 'HideWheel')
+                drag_test(base)
                 call('org.gnome.Shell', '/org/gnome/Shell', 'org.gnome.Shell.Extensions',
                      'DisableExtension', '(s)', (UUID,))
                 wait_for(lambda: extension_info().get('state') == 2, 'extension cleanup')
