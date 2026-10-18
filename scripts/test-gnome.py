@@ -62,8 +62,8 @@ def drag_test(directory):
         input_event('NotifyKeyboardKeycode', '(ub)', (1, True))
         input_event('NotifyKeyboardKeycode', '(ub)', (1, False))
         time.sleep(1)
-        input_event('NotifyPointerMotionRelative', '(dd)', (-10000., -10000.))
-        input_event('NotifyPointerMotionRelative', '(dd)', (640., 360.))
+        input_event('NotifyPointerMotionRelative', '(dd)', (10000., 10000.))
+        input_event('NotifyPointerMotionRelative', '(dd)', (-639., -359.))
         input_event('NotifyPointerButton', '(ib)', (272, True))
         input_event('NotifyPointerMotionRelative', '(dd)', (40., 0.))
         input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
@@ -107,6 +107,7 @@ def main():
         extension = Path(env['XDG_DATA_HOME']) / 'gnome-shell/extensions' / UUID
         shutil.copytree(ROOT / 'linux/gnome' / UUID, extension)
         subprocess.run(['gsettings', 'set', 'org.gnome.shell', 'enabled-extensions', f"['{UUID}']"], env=env, check=True)
+        subprocess.run(['gsettings', 'set', 'org.gnome.desktop.interface', 'enable-hot-corners', 'false'], env=env, check=True)
         with (base / 'shell.log').open('w+') as shell_log, (base / 'app.log').open('w+') as app_log:
             try:
                 processes.append(subprocess.Popen(['gnome-shell', '--headless', '--wayland',
