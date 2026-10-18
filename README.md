@@ -84,7 +84,7 @@ python scripts/package-portable.py --extension-only
 python scripts/package-source.py
 ```
 
-GitHub Actions is configured to run tests and build native Linux, Windows, and Mac artifacts. It has not yet run because this project has no GitHub remote. Nothing is automatically published as a public release.
+GitHub Actions runs tests and builds native Linux, Windows, and Mac artifacts in the private validation repository. Portable packages must pass a frozen-app startup check before being archived. A separate headless GNOME Wayland job loads and unloads the extension and exercises the Qt D-Bus bridge. Nothing is automatically published as a public release.
 
 ## Validation and release status
 

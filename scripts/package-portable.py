@@ -37,6 +37,11 @@ def main():
         '--collect-all','pypdfium2_raw','--collect-all','pillow_heif','--collect-data','reportlab',
         '--exclude-module','PySide6.QtQml','--exclude-module','PySide6.QtQuick',
         '--exclude-module','PySide6.QtTest',str(ROOT/'scripts/portable-entry.py')],check=True,cwd=ROOT)
+    executable = ROOT/'dist/portable/ShiftDrop'/('ShiftDrop.exe' if sys.platform=='win32' else 'ShiftDrop')
+    smoke = [sys.executable, str(ROOT/'scripts/test-package.py'), str(executable)]
+    if sys.platform == 'linux':
+        smoke = ['dbus-run-session', '--', *smoke]
+    subprocess.run(smoke, check=True, cwd=ROOT)
     os_name = 'linux' if sys.platform=='linux' else 'windows'
     name = f'ShiftDrop-{VERSION}-{os_name}-{platform.machine().lower()}'
     with tempfile.TemporaryDirectory(prefix='shiftdrop-package-') as directory:
