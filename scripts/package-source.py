@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / 'dist/ShiftDrop-0.2.0-source.tar.gz'
 FILES = ['.gitignore', '.github', 'Package.swift', 'pyproject.toml', 'constraints.txt', 'README.md',
          'CONTRIBUTING.md', 'THIRD_PARTY_NOTICES.md', 'LICENSE', 'docs', 'portable', 'linux', 'scripts',
-         'Sources', 'Tests', 'Resources']
+         'Sources', 'Tests', 'Resources', 'flake.nix', 'flake.lock', 'nix']
 
 
 def include(info):

@@ -130,6 +130,9 @@ class X11Pointer:
 def gesture_adapter(controller):
     if sys.platform == 'win32':
         return PollingGesture(controller, WindowsPointer())
+    if sys.platform == 'linux' and os.environ.get('HYPRLAND_INSTANCE_SIGNATURE'):
+        from .hyprland import HyprlandBridge
+        return HyprlandBridge(controller)
     if sys.platform == 'linux' and os.environ.get('XDG_SESSION_TYPE') != 'wayland' and os.environ.get('DISPLAY'):
         pointer = X11Pointer()
         controller.application.aboutToQuit.connect(pointer.close)

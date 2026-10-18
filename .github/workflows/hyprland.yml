@@ -1,0 +1,44 @@
+name: Hyprland 0.56.2 and Nix packages
+on:
+  push:
+    paths:
+      - 'flake.*'
+      - 'nix/**'
+      - 'linux/hyprland/**'
+      - 'linux/tests/hyprland*'
+      - 'portable/**'
+      - 'pyproject.toml'
+      - 'scripts/test-hyprland*'
+      - '.github/workflows/hyprland.yml'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hyprland-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  nix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lock build inputs
+        run: nix flake lock && git add flake.lock
+      - name: Test compositor-independent gesture logic
+        run: c++ -std=c++17 linux/tests/hyprland-gesture.cpp -o /tmp/shiftdrop-gesture-test && /tmp/shiftdrop-gesture-test
+      - name: Build matching Hyprland plugin
+        run: nix build .#hyprland-plugin --out-link result-plugin --print-build-logs
+      - name: Build Nix desktop application
+        run: nix build .#shiftdrop --out-link result-app --print-build-logs
+      - name: Smoke test Nix application
+        run: dbus-run-session -- python3 scripts/test-package.py result-app/bin/shiftdrop
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ShiftDrop-Nix-inputs
+          path: flake.lock
+          if-no-files-found: warn
