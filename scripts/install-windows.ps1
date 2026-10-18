@@ -1,7 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 $Target = Join-Path $env:LOCALAPPDATA 'ShiftDrop'
-New-Item -ItemType Directory -Force $Target | Out-Null
 $Bundle = Join-Path $RepoRoot 'ShiftDrop'
 if (Test-Path (Join-Path $Bundle 'ShiftDrop.exe')) {
     $App = Join-Path $Target 'app'
@@ -10,6 +9,14 @@ if (Test-Path (Join-Path $Bundle 'ShiftDrop.exe')) {
     $Executable = Join-Path $App 'ShiftDrop.exe'
     $Arguments = ''
 } else {
+    if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
+        throw 'Source installation requires Python 3.11 or newer and the Python launcher. Use the compiled ShiftDrop-Windows binary ZIP to run without Python, or install Python 3.12 and try again.'
+    }
+    $DetectedVersion = & py -3 -c 'import sys; print(sys.version.split()[0])'
+    if ($LASTEXITCODE -ne 0) { throw 'Could not start Python. Use the compiled ShiftDrop-Windows binary ZIP, or install Python 3.12 and try again.' }
+    if ([version]$DetectedVersion -lt [version]'3.11') {
+        throw "Source installation requires Python 3.11 or newer; the launcher selected $DetectedVersion. Use the compiled ShiftDrop-Windows binary ZIP to run without Python, or install Python 3.12 and try again."
+    }
     $Venv = Join-Path $Target 'venv'
     py -3 -m venv $Venv
     if ($LASTEXITCODE -ne 0) { throw 'Python 3.11 or later is required.' }

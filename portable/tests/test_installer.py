@@ -55,3 +55,28 @@ def test_windows_launcher_uses_process_policy_and_preserves_result(tmp_path, exi
         env={**os.environ, 'PSExecutionPolicyPreference': 'Restricted'})
     assert 'Launcher policy verified' in result.stdout, result.stdout + result.stderr
     assert result.returncode == exit_code, result.stdout + result.stderr
+
+
+@pytest.mark.skipif(sys.platform != 'win32', reason='Requires Windows PowerShell')
+def test_windows_source_installer_rejects_old_python_before_creating_venv(tmp_path):
+    installer = Path(__file__).resolve().parents[2] / 'scripts/install-windows.ps1'
+    quoted_path = str(installer).replace("'", "''")
+    command = f"""
+function global:py {{
+    param([Parameter(ValueFromRemainingArguments=$true)] $Arguments)
+    if ($Arguments -contains '-c') {{
+        $global:LASTEXITCODE = 0
+        Write-Output '3.10.11'
+    }} else {{ throw 'The installer must reject this interpreter before creating a venv.' }}
+}}
+try {{ & '{quoted_path}'; exit 0 }}
+catch {{ Write-Output $_.Exception.Message; exit 42 }}
+"""
+    result = subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
+        '-Command', command], capture_output=True, text=True, timeout=30,
+        env={**os.environ, 'LOCALAPPDATA': str(tmp_path / 'local app data')})
+    assert result.returncode == 42, result.stdout + result.stderr
+    assert 'Python 3.11 or newer' in result.stdout
+    assert '3.10.11' in result.stdout
+    assert 'binary ZIP to run without Python' in result.stdout
+    assert not (tmp_path / 'local app data/ShiftDrop/venv').exists()

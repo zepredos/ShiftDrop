@@ -36,11 +36,15 @@ The extension targets GNOME 46–51 APIs. Ubuntu 24.04 with GNOME 46.2 has passe
 
 Extract the entire Windows binary ZIP, then open `ShiftDrop\ShiftDrop.exe` to run immediately. For a Start menu shortcut, double-click `scripts\install-windows.cmd`.
 
+On GitHub Actions, download the **ShiftDrop-Windows** artifact under a successful run. Extract that download, then extract the `ShiftDrop-0.2.0-windows-*.zip` inside it. The compiled build includes Python and its conversion libraries; your installed Python version does not matter. GitHub's source-code ZIP requires a separate Python installation.
+
 For a source checkout, install Python 3.11 or newer and double-click the same launcher. To run the PowerShell installer directly, open PowerShell in the extracted project folder and use:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install-windows.ps1"
 ```
+
+If the source installer reports Python 3.10 or older, install Python 3.12 (including its launcher), open a new terminal, and rerun it. The installer checks the selected interpreter before creating its environment.
 
 The launcher applies its execution-policy setting only to the installer process and does not change your saved policy or require administrator access. An organization-enforced PowerShell policy can still take precedence; use the binary directly if permitted, or ask your administrator.
 
@@ -92,6 +96,6 @@ GitHub Actions runs tests and builds native Linux, Windows, and Mac artifacts in
 
 ## Validation and release status
 
-The portable suite has 29 shared tests covering conversion, offscreen Qt UI, and Linux installation, plus two Windows-only launcher checks. Two additional tests exercise the GNOME drag state machine. The native Mac app retains its eight tests. Coverage includes real codec decoding, PDF/text/DOCX export, multi-page rollback on failure, output collisions, copy drop semantics, editor layouts, aspect ratios, flattened redaction, launcher paths containing spaces, and process-scoped PowerShell policy handling. Linux and Windows packages must also pass a frozen-app startup check.
+The portable suite has 29 shared tests covering conversion, offscreen Qt UI, and Linux installation, plus three Windows-only installer checks. Two additional tests exercise the GNOME drag state machine. The native Mac app retains its eight tests. Coverage includes real codec decoding, PDF/text/DOCX export, multi-page rollback on failure, output collisions, copy drop semantics, editor layouts, aspect ratios, flattened redaction, launcher paths containing spaces, Python version validation, and process-scoped PowerShell policy handling. Linux and Windows packages must also pass a frozen-app startup check.
 
 The source is in the private [zepredos/ShiftDrop validation repository](https://github.com/zepredos/ShiftDrop). [Validation run 39138434647](https://github.com/zepredos/ShiftDrop/actions/runs/39138434647) passed all four jobs: Linux tests/package/startup, Windows tests/package/startup, native Mac tests/package, and the complete GNOME Wayland drag flow. Physical desktop checks, licensing, and public publication remain release gates. File Explorer dragging, Fedora, multiple monitors, and display scaling require desktop smoke tests. See [release checklist](docs/PUBLISHING.md) and [contributor instructions](CONTRIBUTING.md).
