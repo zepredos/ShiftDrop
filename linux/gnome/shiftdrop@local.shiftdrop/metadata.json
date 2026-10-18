@@ -1,0 +1,7 @@
+{
+  "uuid": "shiftdrop@local.shiftdrop",
+  "name": "ShiftDrop",
+  "description": "Show ShiftDrop's conversion wheel while dragging a file and pressing Shift. Press Shift again for image tools.",
+  "shell-version": ["46", "47", "48", "49", "50", "51"],
+  "version-name": "0.2.0"
+}

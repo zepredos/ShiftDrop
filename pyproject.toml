@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shiftdrop"
+version = "0.2.0"
+description = "Local file conversions with a drag-and-Shift radial menu"
+requires-python = ">=3.11"
+dependencies = [
+  "PySide6-Essentials>=6.8,<7",
+  "Pillow>=11.3,<14",
+  "pillow-heif>=1.0,<2",
+  "pypdfium2>=4.30,<6",
+  "python-docx>=1.1,<2",
+  "reportlab>=4.2,<5",
+  "striprtf>=0.0.29,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pyinstaller>=6.15,<7"]
+
+[project.scripts]
+shiftdrop = "shiftdrop.app:main"
+
+[tool.setuptools.packages.find]
+where = ["portable"]
+
+[tool.pytest.ini_options]
+testpaths = ["portable/tests"]

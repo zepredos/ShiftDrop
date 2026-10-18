@@ -1,0 +1,12 @@
+.build/
+dist/
+.reference/
+.DS_Store
+.playwright-mcp/
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.egg-info/
+build/
+.coverage

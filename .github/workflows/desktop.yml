@@ -1,0 +1,77 @@
+name: Desktop tests and packages
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Linux runtime libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 libgl1 libxkbcommon0 libxcb-cursor0 libdbus-1-3 tesseract-ocr
+      - run: python -m pip install -c constraints.txt -e ".[dev]"
+      - run: python -m pytest -q
+      - run: node --test linux/tests/gesture.test.mjs
+      - name: Build native package
+        run: python scripts/package-portable.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ShiftDrop-${{ runner.os }}
+          path: |
+            dist/ShiftDrop-*.tar.gz
+            dist/ShiftDrop-*.zip
+            dist/shiftdrop-gnome-extension.zip
+          if-no-files-found: error
+          retention-days: 14
+  gnome-wayland:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: constraints.txt
+      - name: GNOME and software rendering
+        run: sudo apt-get update && sudo apt-get install -y gnome-shell dbus-x11 python3-gi libegl1 libopengl0 libgl1 libxkbcommon0 libxcb-cursor0
+      - run: python -m pip install -c constraints.txt -e .
+      - name: Load GNOME extension and exercise Wayland app bridge
+        run: dbus-run-session -- /usr/bin/python3 scripts/test-gnome.py "$(command -v python)"
+  mac-native:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - run: brew install webp
+      - run: bash scripts/test.sh
+      - run: bash scripts/build-app.sh
+      - run: ditto -c -k --keepParent --norsrc dist/ShiftDrop.app dist/ShiftDrop-macOS.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ShiftDrop-macOS
+          path: dist/ShiftDrop-macOS.zip
