@@ -7,6 +7,7 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$app/Contents/Framewor
 cp .build/release/ShiftDrop "$app/Contents/MacOS/ShiftDrop"
 cp Resources/Info.plist "$app/Contents/Info.plist"
 if [ -f Resources/AppIcon.icns ]; then cp Resources/AppIcon.icns "$app/Contents/Resources/"; fi
+cp LICENSE THIRD_PARTY_NOTICES.md "$app/Contents/Resources/"
 webp_prefix=""
 for candidate in /opt/homebrew/opt/webp /usr/local/opt/webp; do
     if [ -f "$candidate/lib/libwebp.dylib" ]; then webp_prefix="$candidate"; break; fi

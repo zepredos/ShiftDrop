@@ -1,5 +1,7 @@
 # Linux setup and verification
 
+> **Nix/NixOS and Hyprland are experimental and untested.** The checks described here validate GNOME 46.2, not the Nix packages or Hyprland companion. See the [experimental NixOS / Hyprland guide](HYPRLAND.md).
+
 The priority target is GNOME on Wayland (Ubuntu/Fedora). Install the desktop app and its Shell extension with `python3 scripts/install-linux.py`. This writes only under the current user's `~/.local` or `XDG_DATA_HOME` and does not need sudo. Install the distribution runtime dependencies listed in the main README separately.
 
 The installer creates an Applications entry, an icon, a D-Bus activation service, a launcher, and the companion extension. A binary archive installs its bundled app. A source checkout creates an isolated virtual environment and installs the project there. After the first extension installation, log out and in before enabling it.

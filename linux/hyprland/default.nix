@@ -6,7 +6,8 @@ hyprland.stdenv.mkDerivation {
   nativeBuildInputs = [ cmake pkg-config ];
   buildInputs = [ hyprland ] ++ hyprland.buildInputs;
   meta = {
-    description = "ShiftDrop drag-and-Shift companion for Hyprland 0.56.2";
+    description = "Experimental, untested ShiftDrop companion for Hyprland 0.56.2";
+    license = lib.licenses.mit;
     platforms = lib.platforms.linux;
   };
 }

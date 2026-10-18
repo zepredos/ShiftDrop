@@ -1,10 +1,10 @@
 # ShiftDrop for Mac
 
-A native macOS menu bar utility recreated from the supplied video: drag a file, press Shift, then drop onto a translucent circular menu. Includes the four-way PDF wheel, eight-way image wheel, seven-way image tools wheel, crop editor, and background editor.
+A native macOS menu bar utility: drag a file, press Shift, then drop onto a translucent circular menu. Includes the four-way PDF wheel, eight-way image wheel, seven-way image tools wheel, crop editor, and background editor.
 
 ## Run
 
-Open `dist/ShiftDrop.app` in Finder. It runs in the menu bar. The included build is for Apple Silicon.
+Download and extract the **ShiftDrop-macOS** artifact from a successful [desktop workflow run](https://github.com/zepredos/ShiftDrop/actions/workflows/desktop.yml), then open `ShiftDrop.app` in Finder. Or follow the build instructions below to create `dist/ShiftDrop.app` locally. It runs in the menu bar. Current packaged builds target Apple Silicon.
 
 1. Start dragging a file from Finder or the desktop.
 2. Press **Shift** to show the format wheel at your pointer.
@@ -48,11 +48,11 @@ iconutil -c icns .reference/AppIcon.iconset -o Resources/AppIcon.icns
 
 ## Version 0.1 scope
 
-This version reproduces the visible PDF/image flows and visual design. It does not include audio/video/archive converters. The source video does not reveal how its second wheel is triggered; pressing Shift again implements that transition. Exact blur and tint depend on the Mac’s wallpaper and transparency settings.
+This version focuses on PDF/image/document conversions and image tools. It does not include audio/video/archive converters. Pressing Shift again switches to the tools wheel. Exact blur and tint depend on the Mac’s wallpaper and transparency settings.
 
 DOCX exports contain reflowed text and do not preserve the source document’s page layout. OCR accuracy depends on the source image. Animated images use the first frame; multipage TIFF conversion preserves its pages. Editors work on one image at a time. Metadata is inspected but not edited. Large images are limited to 12,000 pixels along the longest edge when loaded, with a 100-megapixel rendering limit.
 
-The included app is an Apple Silicon development build with a local signature. App Store distribution, Developer ID signing/notarization, Intel/universal packaging, and launch-at-login are outside this first version.
+The packaged app is an Apple Silicon development build with a local signature. App Store distribution, Developer ID signing/notarization, Intel/universal packaging, and launch-at-login are outside this first version.
 
 ## Validation
 

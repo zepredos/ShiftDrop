@@ -20,11 +20,11 @@ let
   };
 in {
   options.services.shiftdrop = {
-    enable = lib.mkEnableOption "ShiftDrop with the Hyprland 0.56.2 gesture companion";
+    enable = lib.mkEnableOption "experimental, untested ShiftDrop / Hyprland 0.56.2 integration";
     package = lib.mkOption {
       type = lib.types.package;
       default = pkgs.callPackage ./app.nix { };
-      description = "ShiftDrop desktop application.";
+      description = "ShiftDrop desktop application (experimental, untested Nix package).";
     };
   };
   config = lib.mkIf cfg.enable {

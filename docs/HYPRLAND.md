@@ -1,8 +1,10 @@
-# Hyprland 0.56.2
+# NixOS / Hyprland 0.56.2 — experimental, untested
+
+> **Experimental:** the Nix packages, NixOS module, and Hyprland companion have not completed build or end-to-end validation and have not been tested on a physical NixOS or Fedora/Hyprland machine. They are provided for testing and contributions.
 
 ShiftDrop has an experimental Hyprland companion for the same drag + Shift wheel and second-Shift tool toggle. It runs inside the compositor to detect drag state and place the Qt wheel without taking keyboard focus. The app receives native file drops and requests a copy.
 
-The companion targets **Hyprland 0.56.2 only** and must be built with the exact running Hyprland package and compiler. It rejects a mismatched compositor build. Physical NixOS and Fedora desktops still need validation; see the private repository's Hyprland workflow for automated build and VM results.
+The companion targets **Hyprland 0.56.2 only** and must be built with the exact running Hyprland package and compiler. It is designed to reject a mismatched compositor build. See the [Hyprland workflow](https://github.com/zepredos/ShiftDrop/actions/workflows/hyprland.yml) for check results; passing syntax and gesture-logic checks do not establish working desktop support.
 
 Normal CI checks gesture logic and Nix syntax without building the compositor. The full compositor/package/VM job is opt-in: run **Hyprland checks** manually with **integration** enabled. Its first source build can take a long time. The initial integration run was stopped during the compositor build; plugin loading and the complete Hyprland gesture are not yet validated.
 
@@ -11,10 +13,10 @@ Normal CI checks gesture logic and Nix syntax without building the compositor. T
 Keep your existing Hyprland configuration in `configuration.nix`; Home Manager does not need to manage Hyprland. Add ShiftDrop to your system flake's inputs:
 
 ```nix
-inputs.shiftdrop.url = "git+ssh://git@github.com/zepredos/ShiftDrop";
+inputs.shiftdrop.url = "github:zepredos/ShiftDrop";
 ```
 
-The repository is currently private, so the account fetching this input needs access. Add its module to your existing `nixosSystem.modules` list, preserving your current modules:
+Add its module to your existing `nixosSystem.modules` list, preserving your current modules:
 
 ```nix
 modules = [
@@ -55,7 +57,7 @@ end)
 
 Only use the form matching your current config. The NixOS module installs the launcher; it does not rewrite your Hyprland config.
 
-## Fedora / other distributions
+## Fedora / other distributions — experimental, untested
 
 Install the app with `python3 scripts/install-linux.py --no-gnome-extension`. Build the companion against the headers, libraries, and compiler used for your installed Hyprland 0.56.2:
 
@@ -66,7 +68,7 @@ hyprctl plugin load "$PWD/build/hyprland/libshiftdrop.so"
 ~/.local/bin/shiftdrop --background
 ```
 
-This needs CMake 3.30+, pkg-config, and a C++26 compiler matching Hyprland. A generic downloaded plugin binary is not interchangeable with a distribution build. Check your friend's actual `hyprctl version` before using this route. The Fedora path has not been physically validated.
+This needs CMake 3.30+, pkg-config, and a C++26 compiler matching Hyprland. A generic downloaded plugin binary is not interchangeable with a distribution build. Check `hyprctl version` before using this route. The Fedora path has not been physically validated.
 
 ## Verify the desktop gesture
 

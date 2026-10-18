@@ -21,6 +21,7 @@ def extension_archive():
     with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(source.rglob('*')):
             if path.is_file(): archive.write(path, path.relative_to(source))
+        archive.write(ROOT/'LICENSE', 'LICENSE')
     return target
 
 
@@ -35,6 +36,12 @@ def main():
         '--name','ShiftDrop','--paths',str(ROOT/'portable'),'--distpath',str(ROOT/'dist/portable'),
         '--workpath',str(ROOT/'.build/portable'),'--specpath',str(ROOT/'.build'),
         '--collect-all','pypdfium2_raw','--collect-all','pillow_heif','--collect-data','reportlab',
+        '--recursive-copy-metadata','PySide6-Essentials',
+        '--recursive-copy-metadata','Pillow',
+        '--recursive-copy-metadata','python-docx',
+        '--recursive-copy-metadata','reportlab',
+        '--recursive-copy-metadata','striprtf',
+        '--copy-metadata','pyinstaller',
         '--exclude-module','PySide6.QtQml','--exclude-module','PySide6.QtQuick',
         '--exclude-module','PySide6.QtTest',str(ROOT/'scripts/portable-entry.py')],check=True,cwd=ROOT)
     executable = ROOT/'dist/portable/ShiftDrop'/('ShiftDrop.exe' if sys.platform=='win32' else 'ShiftDrop')

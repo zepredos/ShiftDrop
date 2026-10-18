@@ -1,105 +1,140 @@
+<p align="center">
+  <img src="linux/resources/io.github.shiftdrop.ShiftDrop.svg" width="96" alt="ShiftDrop icon">
+</p>
+
 # ShiftDrop
 
-Local file conversions from a translucent radial menu. Drag a file, press **Shift**, and drop onto a format. Release and press **Shift again** during the same drag to switch to image tools.
+**Your files. One gesture.** Free, open-source file conversions for **macOS, Windows, and Linux**.
 
-The native Mac version is retained. The new shared desktop app targets **Linux first**, specifically GNOME on Wayland, and Windows. No account or conversion server is required. Originals and existing outputs are preserved.
+Drag a file, press **Shift**, and drop it onto a format in the translucent radial menu. Release and press **Shift again** during the same drag to switch to seven image tools. Conversions run locally, and outputs are saved as separate copies beside the original.
 
-## Linux: GNOME on Wayland
+[Get started](#get-started) · [Formats and tools](#formats-and-tools) · [Contribute](CONTRIBUTING.md) · [MIT license](LICENSE)
 
-The desktop app handles conversions, radial menus, and image editors. A companion GNOME Shell extension detects the drag + Shift gesture and places the wheel at the pointer. The extension reads drag state and MIME types, not file contents. Qt receives the file drop and accepts a **copy**, so holding Shift cannot move or delete the original.
+> **Experimental and untested:** Nix packages, the NixOS module, and the Hyprland 0.56.2 companion have not completed build and end-to-end validation. They are available for testing, not presented as verified platform support. See [experimental NixOS / Hyprland setup](docs/HYPRLAND.md).
 
-On Ubuntu 24.04 or newer:
+## What works today
+
+- **macOS:** native Swift menu bar app, confirmed working on a physical Mac.
+- **Windows:** shared desktop app, confirmed working on a physical Windows machine. The global gesture targets File Explorer and the desktop.
+- **Linux / GNOME Wayland:** shared desktop app with a GNOME Shell companion. The complete drag, Shift, second-Shift toggle, and copy-drop flow passed an automated GNOME 46.2 Wayland test. Physical Linux desktop testing is still needed.
+- **Other Linux desktops:** an X11 adapter is implemented but needs desktop validation. KDE Wayland has no global gesture companion; use Choose File or drop into the app window.
+- **Nix / NixOS / Hyprland:** experimental and untested. The Hyprland companion currently targets 0.56.2 only and requires an exact compositor/package match.
+
+No account, conversion server, or subscription is required. Originals and existing outputs are preserved. The native Mac app uses Swift/AppKit/SwiftUI; Windows and Linux share a Python/Qt app.
+
+## Get started
+
+Clone the source when following the installation or build instructions:
+
+```sh
+git clone https://github.com/zepredos/ShiftDrop.git
+cd ShiftDrop
+```
+
+Development binaries are also available as artifacts of successful [Desktop tests and packages runs](https://github.com/zepredos/ShiftDrop/actions/workflows/desktop.yml). Artifact downloads require a GitHub account. There is no tagged stable release yet.
+
+### macOS
+
+Download and extract the **ShiftDrop-macOS** artifact, then open `ShiftDrop.app`. Or build locally with macOS 14+, Apple Command Line Tools / Swift 5.9+, and Homebrew:
+
+```sh
+brew install webp
+bash scripts/build-app.sh
+open dist/ShiftDrop.app
+```
+
+The app runs in the menu bar. Current packaged builds target Apple Silicon and use a local development signature; they are not Developer ID signed or notarized. See [Mac setup, features, and limits](docs/MACOS.md).
+
+### Windows
+
+Download the **ShiftDrop-Windows** artifact and extract it, then extract the `ShiftDrop-0.2.0-windows-*.zip` inside. Keep the extracted folder together and open `ShiftDrop\ShiftDrop.exe`. For a Start menu shortcut, double-click `scripts\install-windows.cmd`.
+
+The binary includes Python and the conversion libraries. For a source checkout, install **Python 3.11 or newer** (3.12 recommended), then double-click the same installer. If running PowerShell directly:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install-windows.ps1"
+```
+
+The installer applies the execution-policy setting only to that process; it does not change the saved policy or require administrator access. Organization-enforced policies can still take precedence. OCR requires local Tesseract in `PATH`.
+
+### Linux: GNOME on Wayland
+
+Install Python 3.11+ and your distribution's runtime libraries, then run the user-local installer.
+
+Ubuntu 24.04 or newer:
 
 ```sh
 sudo apt install python3-venv libegl1 libopengl0 libxcb-cursor0 libxkbcommon0 tesseract-ocr
 python3 scripts/install-linux.py
 ```
 
-On Fedora with GNOME:
+Fedora with GNOME:
 
 ```sh
 sudo dnf install python3 python3-pip mesa-libEGL mesa-libGL libxkbcommon tesseract tesseract-langpack-eng
 python3 scripts/install-linux.py
 ```
 
-After the first installation, log out and back in, then enable the extension:
+After the first extension installation, log out and back in, then enable it:
 
 ```sh
 gnome-extensions enable shiftdrop@local.shiftdrop
 ```
 
-Open **ShiftDrop** from Applications, or use its GNOME panel icon. The panel icon provides access on desktops without an AppIndicator tray. The app can start automatically through D-Bus when Shift triggers a file drag. On X11, install with `--no-gnome-extension`; the app detects XDND drags directly.
+Open **ShiftDrop** from Applications or its GNOME panel icon. The app can also activate through D-Bus when the extension detects a file drag + Shift. The companion reads drag state and MIME types; native Qt drag-and-drop supplies files and accepts a copy.
 
-The extension targets GNOME 46–51 APIs. Ubuntu 24.04 with GNOME 46.2 has passed a headless Wayland test of the complete drag, Shift, second-Shift toggle, and copy-drop conversion flow. Other GNOME versions and physical desktop configurations still need validation. See [Linux setup and smoke test](docs/LINUX.md).
+GNOME 46–51 are API targets; automated end-to-end validation currently covers GNOME 46.2. On X11, install with `--no-gnome-extension`. See [Linux setup and desktop checks](docs/LINUX.md).
 
-## Linux: Hyprland 0.56.2
+### Nix / NixOS / Hyprland — experimental, untested
 
-An experimental compositor companion adds drag + Shift, second-Shift toggling, and wheel placement on Hyprland 0.56.2. NixOS users can keep Hyprland in `configuration.nix`: the supplied module builds the companion against the configured system package. See [NixOS and Fedora setup](docs/HYPRLAND.md) and the private Hyprland validation workflow. Physical desktops still need validation.
+The repository includes a flake, a NixOS module, and a companion for **Hyprland 0.56.2**. The module is designed to build the companion against your existing `config.programs.hyprland.package`; Hyprland can stay in `configuration.nix` rather than Home Manager.
 
-## Windows
+These paths have **not been validated on a NixOS machine**. The initial full integration run was stopped while compiling Hyprland; plugin loading and the complete Hyprland gesture have not passed end-to-end testing. Routine CI checks syntax and isolated gesture logic only. The expensive package/compositor/VM test remains **manual and opt-in**.
 
-Extract the entire Windows binary ZIP, then open `ShiftDrop\ShiftDrop.exe` to run immediately. For a Start menu shortcut, double-click `scripts\install-windows.cmd`.
-
-On GitHub Actions, download the **ShiftDrop-Windows** artifact under a successful run. Extract that download, then extract the `ShiftDrop-0.2.0-windows-*.zip` inside it. The compiled build includes Python and its conversion libraries; your installed Python version does not matter. GitHub's source-code ZIP requires a separate Python installation.
-
-For a source checkout, install Python 3.11 or newer and double-click the same launcher. To run the PowerShell installer directly, open PowerShell in the extracted project folder and use:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\install-windows.ps1"
-```
-
-If the source installer reports Python 3.10 or older, install Python 3.12 (including its launcher), open a new terminal, and rerun it. The installer checks the selected interpreter before creating its environment.
-
-The launcher applies its execution-policy setting only to the installer process and does not change your saved policy or require administrator access. An organization-enforced PowerShell policy can still take precedence; use the binary directly if permitted, or ask your administrator.
-
-Open ShiftDrop from the Start menu. Drag + Shift is detected for File Explorer and the desktop. Choose File and dropping into ShiftDrop's window also work. OCR requires Tesseract in `PATH`. The conversion/UI suite, native packaging, and frozen-app startup check pass on the Windows 2025 runner. The user has confirmed the app works on a physical Windows desktop; detailed cancellation, editor, and display-scaling checks remain.
-
-## Mac
-
-Open `dist/ShiftDrop.app` for the existing native Swift app. See [Mac instructions](docs/MACOS.md). The new Python application does not replace it.
+Use the [experimental NixOS and Hyprland guide](docs/HYPRLAND.md) if you want to help test. Fedora/Hyprland is experimental too.
 
 ## Formats and tools
 
-- PDF → JPG/PNG pages at 300 dpi, TXT, and DOCX. PDF pages are processed individually.
-- Images → JPG, PNG, WebP, HEIC, TIFF, AVIF, BMP, PDF, and DOCX via local OCR.
-- UTF-8 text, Markdown, RTF, and DOCX → PDF, DOCX, TXT, and PNG.
-- Crop, compress, inspect metadata, adjust brightness/contrast/saturation, rotate, flip, annotate, redact, and add backgrounds.
-- Background presets, custom colors, padding, corner radius, shadow, and canvas ratios match the Mac flow.
+- **PDF:** JPG/PNG pages at 300 dpi, TXT, and DOCX; pages are processed individually.
+- **Images:** JPG, PNG, WebP, HEIC, TIFF, AVIF, BMP, PDF, and DOCX through local OCR.
+- **Text / Markdown / RTF / DOCX:** PDF, DOCX, TXT, and PNG. Plain text inputs must be UTF-8.
+- **Seven image tools:** compress, metadata inspection, edit, annotate, add background, crop, and redact.
+- **Editing:** brightness, contrast, saturation, rotation, flip, crop ratios and dimensions, background presets/custom colors, padding, corners, and shadows.
 
-Editors save separate copies. Redactions are flattened into pixels and exports discard input metadata. DOCX output contains reflowed text. Animated images use their first frame. Editors work on one image at a time. Images are limited to 100 megapixels and 16,000 pixels per side. Image-to-text and scanned PDF exports require local Tesseract and its English data. Codec availability depends on the installed Pillow/HEIF wheels.
+Editors save separate copies. Redactions are flattened into pixels and exports discard input metadata. DOCX output contains reflowed text rather than the original page layout. Editors handle one image at a time; animated images use their first frame. Image-to-text and scanned PDF exports need local OCR. Codec availability and image limits vary by platform; see the platform guides. Audio, video, and archive conversion are outside the current scope.
 
-## Development
+## Development and validation
 
 ```sh
 python3 -m venv .venv
-# Linux / macOS:
+# Linux / macOS; use .venv\Scripts\python.exe on Windows:
 .venv/bin/python -m pip install -c constraints.txt -e ".[dev]"
 .venv/bin/python -m shiftdrop
 .venv/bin/python -m pytest -q
 node --test linux/tests/gesture.test.mjs
 ```
 
-On Windows use `.venv/Scripts/python.exe` instead. Python 3.12 is used by the portable build workflow. The app uses Qt's essential modules, Pillow/HEIF, PDFium, python-docx, and ReportLab. There is no web renderer.
+Native Mac checks use `bash scripts/test.sh`. The desktop workflow tests Linux and Windows, builds their native packages, checks frozen-app startup, tests the native Mac app, and exercises a real GNOME Wayland file drag. [Run 39146536652](https://github.com/zepredos/ShiftDrop/actions/runs/39146536652) passed all four desktop jobs. Mac and Windows were also confirmed working on physical desktops on 2026-10-18.
+
+The separate [Hyprland checks workflow](https://github.com/zepredos/ShiftDrop/actions/workflows/hyprland.yml) keeps normal checks lightweight. A passing quick check does **not** establish working NixOS or Hyprland support. Detailed editor, cancellation, display-scaling, multi-monitor, and broader Linux desktop checks remain.
 
 ## Packaging
 
-Run this on the target OS to build its binary and installable archive:
+Build on the target OS; PyInstaller does not cross-compile native binaries from macOS:
 
 ```sh
 python scripts/package-portable.py
 ```
 
-Linux produces a `.tar.gz` with a user-local installer; Windows produces a ZIP with an executable and Start menu installer. Both include their conversion libraries. PyInstaller cannot cross-compile native binaries from a Mac. The GNOME extension and a clean source archive can be packaged anywhere:
+This creates a Linux `.tar.gz` or Windows ZIP containing the app and installer. GNOME and clean source archives can be packaged separately:
 
 ```sh
 python scripts/package-portable.py --extension-only
 python scripts/package-source.py
 ```
 
-GitHub Actions runs tests and builds native Linux, Windows, and Mac artifacts in the private validation repository. Portable packages must pass a frozen-app startup check before being archived. A separate headless GNOME Wayland job loads and unloads the extension and exercises the Qt D-Bus bridge. Nothing is automatically published as a public release.
+No GitHub release is published automatically. See [release checklist](docs/PUBLISHING.md) and [contributor instructions](CONTRIBUTING.md). Launch video projects and reference recordings are kept outside the repository.
 
-## Validation and release status
+## License
 
-The portable suite has 29 shared tests covering conversion, offscreen Qt UI, and Linux installation, plus three Windows-only installer checks. Two additional tests exercise the GNOME drag state machine. The native Mac app retains its eight tests. Coverage includes real codec decoding, PDF/text/DOCX export, multi-page rollback on failure, output collisions, copy drop semantics, editor layouts, aspect ratios, flattened redaction, launcher paths containing spaces, Python version validation, and process-scoped PowerShell policy handling. Linux and Windows packages must also pass a frozen-app startup check.
-
-The source is in the private [zepredos/ShiftDrop validation repository](https://github.com/zepredos/ShiftDrop). [Validation run 39141604776](https://github.com/zepredos/ShiftDrop/actions/runs/39141604776) passed all four jobs: Linux tests/package/startup, Windows tests/package/startup, native Mac tests/package, and the complete GNOME Wayland drag flow. The user confirmed the app works on Mac and Windows on 2026-10-18. An experimental Hyprland companion and NixOS module are undergoing separate build and VM validation. Detailed desktop checks, licensing, and public publication remain release gates. See [Linux scope](docs/LINUX.md), [release checklist](docs/PUBLISHING.md), and [contributor instructions](CONTRIBUTING.md).
+ShiftDrop's original code is available under the [MIT License](LICENSE). Third-party libraries and codecs retain their own licenses; see [third-party components and notices](THIRD_PARTY_NOTICES.md).

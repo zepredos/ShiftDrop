@@ -6,6 +6,9 @@ python3Packages.buildPythonApplication {
     root = ../.;
     fileset = lib.fileset.unions [
       ../pyproject.toml
+      ../README.md
+      ../LICENSE
+      ../THIRD_PARTY_NOTICES.md
       (lib.fileset.fileFilter (file: file.hasExt "py") ../portable)
       ../linux/resources
     ];
@@ -44,7 +47,8 @@ python3Packages.buildPythonApplication {
   '';
   pythonImportsCheck = [ "shiftdrop.engine" "shiftdrop.hyprland" ];
   meta = {
-    description = "Local file conversions with a drag-and-Shift radial menu";
+    description = "Local file conversions (experimental, untested Nix package)";
+    license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "shiftdrop";
   };

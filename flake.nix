@@ -1,5 +1,5 @@
 {
-  description = "ShiftDrop desktop app and Hyprland 0.56.2 companion";
+  description = "ShiftDrop — experimental, untested Nix packages and Hyprland 0.56.2 companion";
   inputs.hyprland.url = "github:hyprwm/Hyprland/v0.56.2";
   inputs.nixpkgs.follows = "hyprland/nixpkgs";
   inputs.glaze-src = { url = "github:stephenberry/glaze/v7.2.0"; flake = false; };
