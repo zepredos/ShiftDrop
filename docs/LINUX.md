@@ -4,6 +4,12 @@ The priority target is GNOME on Wayland (Ubuntu/Fedora). Install the desktop app
 
 The installer creates an Applications entry, an icon, a D-Bus activation service, a launcher, and the companion extension. A binary archive installs its bundled app. A source checkout creates an isolated virtual environment and installs the project there. After the first extension installation, log out and in before enabling it.
 
+## Automated validation
+
+Ubuntu 24.04 with GNOME/Mutter 46.2 passed the headless Wayland integration job in [run 39138434647](https://github.com/zepredos/ShiftDrop/actions/runs/39138434647). It loads the extension, sends a real file drag through Wayland using virtual input, checks first Shift activation and second Shift toggling, drops onto JPEG while holding Shift, and verifies a copy action and an unchanged original. Extension disable/cleanup and the D-Bus controls are checked too. The bundled Linux executable separately passes startup and D-Bus checks.
+
+The virtual input belongs only to the isolated CI compositor. It is not part of the shipped app or extension. Physical devices, Fedora, multiple monitors, fractional scaling, and other GNOME versions still require the checks below.
+
 ## Required checks on a GNOME desktop
 
 1. Run `gnome-shell --version` and confirm the version is listed in the extension metadata. The current target range is 46–51; these are API targets, not a claim of completed runtime tests.

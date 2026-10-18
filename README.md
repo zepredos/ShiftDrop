@@ -30,7 +30,7 @@ gnome-extensions enable shiftdrop@local.shiftdrop
 
 Open **ShiftDrop** from Applications, or use its GNOME panel icon. The panel icon provides access on desktops without an AppIndicator tray. The app can start automatically through D-Bus when Shift triggers a file drag. On X11, install with `--no-gnome-extension`; the app detects XDND drags directly.
 
-The extension targets GNOME 46–51 APIs. This is an experimental port: native GNOME runtime validation is required before calling these versions supported. See [Linux setup and smoke test](docs/LINUX.md).
+The extension targets GNOME 46–51 APIs. Ubuntu 24.04 with GNOME 46.2 has passed a headless Wayland test of the complete drag, Shift, second-Shift toggle, and copy-drop conversion flow. Other GNOME versions and physical desktop configurations still need validation. See [Linux setup and smoke test](docs/LINUX.md).
 
 ## Windows
 
@@ -40,7 +40,7 @@ For the source version, install Python 3.11 or newer, then run:
 powershell -File scripts/install-windows.ps1
 ```
 
-Open ShiftDrop from the Start menu. Drag + Shift is detected for File Explorer and the desktop. Choose File and dropping into ShiftDrop's window also work. OCR requires Tesseract in `PATH`. The Windows adapter and packaging workflow need a native Windows run before release.
+Open ShiftDrop from the Start menu. Drag + Shift is detected for File Explorer and the desktop. Choose File and dropping into ShiftDrop's window also work. OCR requires Tesseract in `PATH`. The conversion/UI suite, native packaging, and frozen-app startup check pass on the Windows 2025 runner. File Explorer gesture behavior still needs a physical desktop smoke test.
 
 ## Mac
 
@@ -88,6 +88,6 @@ GitHub Actions runs tests and builds native Linux, Windows, and Mac artifacts in
 
 ## Validation and release status
 
-The portable conversion and offscreen Qt UI suite has 28 passing tests on the development Mac. Two additional tests exercise the GNOME drag state machine. The native Mac app retains its eight passing tests. Coverage includes real codec decoding, PDF/text/DOCX export, multi-page rollback on failure, output collisions, copy drop semantics, editor layouts, aspect ratios, and flattened redaction.
+The portable suite has 29 tests covering conversion, offscreen Qt UI, and Linux installation. Two additional tests exercise the GNOME drag state machine. The native Mac app retains its eight tests. Coverage includes real codec decoding, PDF/text/DOCX export, multi-page rollback on failure, output collisions, copy drop semantics, editor layouts, aspect ratios, flattened redaction, and launcher paths containing spaces. Linux and Windows packages must also pass a frozen-app startup check.
 
-GNOME Wayland drag placement and File Explorer dragging require native desktop smoke tests. The project is being prepared for GitHub; licensing, native CI results, and public publication are the next release gates. See [release checklist](docs/PUBLISHING.md) and [contributor instructions](CONTRIBUTING.md).
+The source is in the private [zepredos/ShiftDrop validation repository](https://github.com/zepredos/ShiftDrop). [Validation run 39138434647](https://github.com/zepredos/ShiftDrop/actions/runs/39138434647) passed all four jobs: Linux tests/package/startup, Windows tests/package/startup, native Mac tests/package, and the complete GNOME Wayland drag flow. Physical desktop checks, licensing, and public publication remain release gates. File Explorer dragging, Fedora, multiple monitors, and display scaling require desktop smoke tests. See [release checklist](docs/PUBLISHING.md) and [contributor instructions](CONTRIBUTING.md).
