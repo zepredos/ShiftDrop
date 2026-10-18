@@ -6,6 +6,12 @@
 
 **Your files. One gesture.** Free, open-source file conversions for **macOS, Windows, and Linux**.
 
+
+
+https://github.com/user-attachments/assets/61562337-a528-4a51-aeb3-0ae893153d35
+
+
+
 Drag a file, press **Shift**, and drop it onto a format in the translucent radial menu. Release and press **Shift again** during the same drag to switch to seven image tools. Conversions run locally, and outputs are saved as separate copies beside the original.
 
 [Get started](#get-started) · [Formats and tools](#formats-and-tools) · [Contribute](CONTRIBUTING.md) · [MIT license](LICENSE)
