@@ -24,8 +24,8 @@ def call(name, path, interface, method, signature=None, values=()):
                          Gio.DBusCallFlags.NONE, 3000, None).unpack()
 
 
-def wait_for(check, description):
-    deadline = time.monotonic() + 60
+def wait_for(check, description, timeout=60):
+    deadline = time.monotonic() + timeout
     last = None
     while time.monotonic() < deadline:
         try:
@@ -67,17 +67,17 @@ def drag_test(directory):
         input_event('NotifyPointerButton', '(ib)', (272, True))
         input_event('NotifyPointerMotionRelative', '(dd)', (40., 0.))
         input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
-        wait_for(lambda: state().get('visible'), 'drag + Shift wheel')
+        wait_for(lambda: state().get('visible'), 'drag + Shift wheel', 15)
         input_event('NotifyKeyboardKeycode', '(ub)', (42, False))
         input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
-        wait_for(lambda: state().get('tools'), 'second Shift tools wheel')
+        wait_for(lambda: state().get('tools'), 'second Shift tools wheel', 15)
         input_event('NotifyKeyboardKeycode', '(ub)', (42, False))
         input_event('NotifyKeyboardKeycode', '(ub)', (42, True))
-        wait_for(lambda: state().get('visible') and not state().get('tools'), 'conversion wheel toggle')
+        wait_for(lambda: state().get('visible') and not state().get('tools'), 'conversion wheel toggle', 15)
         input_event('NotifyPointerMotionRelative', '(dd)', (0., -110.))
         input_event('NotifyPointerButton', '(ib)', (272, False))
         input_event('NotifyKeyboardKeycode', '(ub)', (42, False))
-        wait_for(lambda: state().get('outputs'), 'converted copy after real Wayland drop')
+        wait_for(lambda: state().get('outputs'), 'converted copy after real Wayland drop', 15)
         result = state()
         assert result['drop_action'] == 1, result  # Qt.CopyAction even while Shift requests move.
         original = directory / 'Drag Original.png'
@@ -109,8 +109,8 @@ def main():
         # Instrument only this isolated test copy, keeping the shipping extension quiet.
         script = extension / 'extension.js'
         text = script.read_text()
-        text = text.replace("if (type !== Meta.SelectionType.DND)",
-            "console.log(`ShiftDrop TEST selection ${type}, DND ${Meta.SelectionType.DND}, owner ${Boolean(owner)}`);\n            if (type !== Meta.SelectionType.DND)")
+        text = text.replace("if (type !== Meta.SelectionType.SELECTION_DND)",
+            "console.log(`ShiftDrop TEST selection ${type}, DND ${Meta.SelectionType.SELECTION_DND}, owner ${Boolean(owner)}`);\n            if (type !== Meta.SelectionType.SELECTION_DND)")
         text = text.replace('const action = this._gesture.update', '''const diagnostic = JSON.stringify({dragging: this._dragging, modifiers, types, paused: this._pause.state});
         if (this._testDiagnostic !== diagnostic) {
             this._testDiagnostic = diagnostic;

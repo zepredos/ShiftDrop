@@ -32,7 +32,7 @@ export default class ShiftDropExtension extends Extension {
         this._indicator.menu.addMenuItem(this._pause);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
         this._ownerSignal = this._selection.connect('owner-changed', (_selection, type, owner) => {
-            if (type !== Meta.SelectionType.DND)
+            if (type !== Meta.SelectionType.SELECTION_DND)
                 return;
             this._dragging = Boolean(owner);
             if (this._dragging && !this._timer) {
@@ -47,7 +47,7 @@ export default class ShiftDropExtension extends Extension {
         if (!this._enabled)
             return GLib.SOURCE_REMOVE;
         const [x, y, modifiers] = global.get_pointer();
-        const types = this._selection.get_mimetypes(Meta.SelectionType.DND) ?? [];
+        const types = this._selection.get_mimetypes(Meta.SelectionType.SELECTION_DND) ?? [];
         const dragging = Boolean(this._dragging && (modifiers & Clutter.ModifierType.BUTTON1_MASK) && types.includes('text/uri-list'));
         const action = this._gesture.update(dragging && !this._pause.state,
             Boolean(modifiers & Clutter.ModifierType.SHIFT_MASK));

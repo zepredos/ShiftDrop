@@ -58,7 +58,8 @@ def snapshot():
     state = {'visible': controller.wheel.isVisible(), 'tools': controller.wheel.tools,
              'outputs': [str(path) for path in controller.outputs], 'drop_action': drop_action,
              'cursor': [cursor.x(), cursor.y()], 'pressed': pressed, 'drag_started': drag_started,
-             'source_active': source.isActiveWindow(), 'source_size': [source.width(), source.height()]}
+             'source_active': source.isActiveWindow(), 'source_size': [source.width(), source.height()],
+             'actions': list(controller.wheel.labels), 'wheel_position': [controller.wheel.x(), controller.wheel.y()]}
     temporary = directory / 'state.tmp'
     temporary.write_text(json.dumps(state))
     temporary.replace(directory / 'state.json')
