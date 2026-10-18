@@ -4,6 +4,8 @@ ShiftDrop has an experimental Hyprland companion for the same drag + Shift wheel
 
 The companion targets **Hyprland 0.56.2 only** and must be built with the exact running Hyprland package and compiler. It rejects a mismatched compositor build. Physical NixOS and Fedora desktops still need validation; see the private repository's Hyprland workflow for automated build and VM results.
 
+Normal CI checks gesture logic and Nix syntax without building the compositor. The full compositor/package/VM job is opt-in: run **Hyprland checks** manually with **integration** enabled. Its first source build can take a long time. The initial integration run was stopped during the compositor build; plugin loading and the complete Hyprland gesture are not yet validated.
+
 ## NixOS with a flake and configuration.nix
 
 Keep your existing Hyprland configuration in `configuration.nix`; Home Manager does not need to manage Hyprland. Add ShiftDrop to your system flake's inputs:

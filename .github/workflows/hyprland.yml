@@ -1,4 +1,4 @@
-name: Hyprland 0.56.2 and Nix packages
+name: Hyprland checks
 on:
   push:
     paths:
@@ -12,13 +12,32 @@ on:
       - '.github/workflows/hyprland.yml'
   pull_request:
   workflow_dispatch:
+    inputs:
+      integration:
+        description: 'Build Hyprland 0.56.2 and run the full NixOS VM test (slow first build)'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
   group: hyprland-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  quick:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Test compositor-independent gesture logic
+        run: c++ -std=c++17 linux/tests/hyprland-gesture.cpp -o /tmp/shiftdrop-gesture-test && /tmp/shiftdrop-gesture-test
+      - uses: cachix/install-nix-action@v31
+      - name: Check Nix syntax without building dependencies
+        run: |
+          for source in flake.nix nix/*.nix linux/hyprland/default.nix; do
+            nix-instantiate --parse "$source" >/dev/null
+          done
   nix:
+    if: github.event_name == 'workflow_dispatch' && inputs.integration
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -28,8 +47,6 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Lock build inputs
         run: nix flake lock && git add flake.lock
-      - name: Test compositor-independent gesture logic
-        run: c++ -std=c++17 linux/tests/hyprland-gesture.cpp -o /tmp/shiftdrop-gesture-test && /tmp/shiftdrop-gesture-test
       - name: Build matching Hyprland plugin
         run: nix build .#hyprland-plugin --out-link result-plugin --print-build-logs
       - name: Build Nix desktop application
