@@ -49,6 +49,23 @@
         "type": "github"
       }
     },
+    "glaze-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773106463,
+        "narHash": "sha256-f3NVRi3SXKo42hn0WCw7JsOK3EkdOVJIcuzhPorKjFY=",
+        "owner": "stephenberry",
+        "repo": "glaze",
+        "rev": "b518eec7a22e56ffa238b072c07f47efa7cea97f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stephenberry",
+        "ref": "v7.2.0",
+        "repo": "glaze",
+        "type": "github"
+      }
+    },
     "hyprcursor": {
       "inputs": {
         "hyprlang": [
@@ -409,6 +426,7 @@
     },
     "root": {
       "inputs": {
+        "glaze-src": "glaze-src",
         "hyprland": "hyprland",
         "nixpkgs": [
           "hyprland",
