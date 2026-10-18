@@ -106,6 +106,18 @@ def main():
                    LIBGL_ALWAYS_SOFTWARE='1', QT_QPA_PLATFORM='wayland', WAYLAND_DISPLAY='wayland-0')
         extension = Path(env['XDG_DATA_HOME']) / 'gnome-shell/extensions' / UUID
         shutil.copytree(ROOT / 'linux/gnome' / UUID, extension)
+        # Instrument only this isolated test copy, keeping the shipping extension quiet.
+        script = extension / 'extension.js'
+        text = script.read_text()
+        text = text.replace("if (type !== Meta.SelectionType.DND)",
+            "console.log(`ShiftDrop TEST selection ${type}, DND ${Meta.SelectionType.DND}, owner ${Boolean(owner)}`);\n            if (type !== Meta.SelectionType.DND)")
+        text = text.replace('const action = this._gesture.update', '''const diagnostic = JSON.stringify({dragging: this._dragging, modifiers, types, paused: this._pause.state});
+        if (this._testDiagnostic !== diagnostic) {
+            this._testDiagnostic = diagnostic;
+            console.log('ShiftDrop TEST pointer ' + diagnostic);
+        }
+        const action = this._gesture.update''')
+        script.write_text(text)
         subprocess.run(['gsettings', 'set', 'org.gnome.shell', 'enabled-extensions', f"['{UUID}']"], env=env, check=True)
         subprocess.run(['gsettings', 'set', 'org.gnome.desktop.interface', 'enable-hot-corners', 'false'], env=env, check=True)
         with (base / 'shell.log').open('w+') as shell_log, (base / 'app.log').open('w+') as app_log:
